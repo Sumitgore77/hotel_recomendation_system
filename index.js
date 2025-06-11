@@ -106,7 +106,7 @@ app.post("/saveReg", (req, res) => {
       return res.send("Error registering user.");
     }
     else{
-       res.render("login.ejs",{msg:"User Registration Successfully..!"});
+       res.render("login.ejs",);
     }
    
   });
