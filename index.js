@@ -1,5 +1,3 @@
-// main.js
-
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -94,29 +92,33 @@ app.get('/register', (req, res) => {
 });
 
 app.post("/saveReg", (req, res) => {
-  const { name, email, password, confirm_password, contact, type } = req.body;
+  const { name, email, password, confirm_password, contact} = req.body;
+  const type="user";
 
   if (password !== confirm_password) {
     return res.send("Password and Confirm Password do not match.");
   }
+  const sql = "INSERT INTO userMaster (username, useremail, password, contact, type) VALUES (?, ?, ?, ?,?)";
 
-  const sql = "INSERT INTO userMaster (username, useremail, password, contact, type) VALUES (?, ?, ?, ?, ?)";
-
-  conn.query(sql, [name, email, password, contact, type], (err, result) => {
+  conn.query(sql, [name, email, password, contact,type], (err, result) => {
     if (err) {
       console.error("Error inserting data:", err);
       return res.send("Error registering user.");
     }
-    res.render("login.ejs");
+    else{
+       res.render("login.ejs",);
+    }
+   
   });
 });
 
 
 // Handle login POST
 app.post('/login', (req, res) => {
-  const { email, password, type } = req.body;
+  const { email, password} = req.body;
+  const type="User";
 
-  const sql = 'SELECT * FROM userMaster WHERE useremail = ? AND password = ? AND type = ?';
+  const sql = 'SELECT * FROM userMaster WHERE useremail = ? AND password = ? AND type =?';
   conn.query(sql, [email, password, type], (err, results) => {
     if (err) {
       console.error(err);
@@ -125,7 +127,7 @@ app.post('/login', (req, res) => {
 
     if (results.length > 0) {
       const user = results[0];
-      res.send(`Welcome ${user.username} (${user.type})!`);
+      res.send(Welcome ${user.username} (${user.type})!);
     } else {
       res.send('Invalid credentials or user type.');
     }
