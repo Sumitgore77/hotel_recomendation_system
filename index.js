@@ -12,6 +12,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 let conn = require("./src/config/db");
 app.use(express.json());
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+
 
 
 //home page
@@ -71,6 +73,8 @@ app.get('/register', (req, res) => {
 //Save Register Data
 app.post("/saveReg", (req, res) => {
   const { name, email, password, confirm_password, contact} = req.body;
+   const hashedPassword = bcrypt.hashSync(password, 8);
+
   const type="user";
 
   if (password !== confirm_password) {
@@ -78,7 +82,7 @@ app.post("/saveReg", (req, res) => {
   }
   const sql = "INSERT INTO userMaster (username, useremail, password, contact, type) VALUES (?, ?, ?, ?,?)";
 
-  conn.query(sql, [name, email, password, contact,type], (err, result) => {
+  conn.query(sql, [name, email, hashedPassword, contact,type], (err, result) => {
     if (err) {
       console.error("Error inserting data:", err);
       return res.send("Error registering user.");
@@ -89,47 +93,45 @@ app.post("/saveReg", (req, res) => {
   });
 });
 
-
 // Handle login POST
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
-  const type = "User";
 
-  const sql = 'SELECT * FROM userMaster WHERE useremail = ? AND password = ? AND type = ?';
-  conn.query(sql, [email, password, type], (err, results) => {
+  const sql = 'SELECT * FROM userMaster WHERE useremail = ?';
+  conn.query(sql, [email], async (err, results) => {
     if (err) {
-      console.error(err);
-      return res.status(500).send('An error occurred.');
+      console.error("Query error:", err);
+      return res.status(500).send('Server error.');
     }
 
-    if (results.length > 0) {
-      const user = results[0];
-
-      const payload = {
-        id: user.id,
-        name: user.username,
-        email: user.useremail,
-        type: user.type
-      };
-
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN
-      });
-
-      return res.json({
-        message: `Welcome ${user.username} (${user.type})!`,token
-      });
-    } else {
-      return res.status(401).send('Invalid credentials or user type.');
+    if (results.length === 0) {
+      return res.status(401).send('Invalid email or password.');
     }
+
+    const user = results[0];
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).send('Invalid email or password.');
+    }
+
+    const payload = {
+      id: user.id,
+      name: user.username,
+      email: user.useremail,
+      type: user.type
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN
+    });
+
+    res.json({
+      message: `Welcome ${user.type} ${user.username}!`,
+      token
+    });
   });
 });
-
-
-
-
-
-
 
 
 
