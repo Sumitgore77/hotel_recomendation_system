@@ -1,8 +1,7 @@
-// main.js
-
 const express = require('express');
 const app = express();
 const path = require('path');
+require('dotenv').config();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname,'views'));
 const dotenv = require('dotenv');
@@ -12,87 +11,64 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 let conn = require("./src/config/db");
 app.use(express.json());
+const jwt = require('jsonwebtoken');
 
+
+//home page
 app.get("/", (req, res) => {
-  const hotels = [
-  {
-    id: 1,
-    name: "Hotel Taj",
-    image: "/Images/1.jpg",
-    rating: 4.8,
-    description: "Luxury hotel with sea view and premium rooms."
-  },
-  {
-    id: 2,
-    name: "The Oberoi",
-    image: "/Images/2.jpg",
-    rating: 4.6,
-    description: "Elegant ambiance with world-class dining experience."
-  },
-  {
-    id: 3,
-    name: "Trident",
-    image: "/Images/3.jpg",
-    rating: 4.4,
-    description: "Affordable comfort and great hospitality."
-  },
-  {
-    id: 4,
-    name: "Leela Palace",
-    image: "/Images/4.jpg",
-    rating: 4.9,
-    description: "Royal luxury with traditional Indian architecture."
-  },
-  {
-    id: 5,
-    name: "ITC Grand",
-    image: "/Images/5.jpg",
-    rating: 4.5,
-    description: "Green hotel with exquisite fine dining."
-  },
-  {
-    id: 6,
-    name: "JW Marriott",
-    image: "/Images/6.jpg",
-    rating: 4.7,
-    description: "Modern amenities with excellent customer service."
-  },
-  {
-    id: 7,
-    name: "Hyatt Regency",
-    image: "/Images/7.jpg",
-    rating: 4.3,
-    description: "Business-friendly stay with elegant decor."
-  },
-  {
-    id: 8,
-    name: "Radisson Blu",
-    image: "/Images/8.jpg",
-    rating: 4.2,
-    description: "Comfortable rooms with a lively bar and buffet."
-  },
-  {
-    id: 9,
-    name: "Fairmont Jaipur",
-    image: "/Images/9.jpg",
-    rating: 4.6,
-    description: "Palace-style stay with luxury spa experience."
-  }
-];
-  res.render("home", { hotels });
+  const { search = '', rating = '', city = '' } = req.query;
+
+  const allHotels = [
+    {
+      id: 1,
+      name: "Hotel Taj",
+      city: "Mumbai",
+      image: "/Images/1.jpg",
+      rating: 4.8,
+      description: "Luxury hotel with sea view and premium rooms."
+    },
+    {
+      id: 2,
+      name: "The Oberoi",
+      city: "Delhi",
+      image: "/Images/2.jpg",
+      rating: 4.6,
+      description: "Elegant ambiance with world-class dining experience."
+    },
+    {
+      id: 3,
+      name: "Fairmont Jaipur",
+      city: "Jaipur",
+      image: "/Images/3.jpg",
+      rating: 4.6,
+      description: "Palace-style stay with luxury spa experience."
+    },
+    // add remaining hotels with `city` field
+  ];
+
+  let filteredHotels = allHotels.filter(hotel => {
+    const matchesSearch = search === '' || hotel.name.toLowerCase().includes(search.toLowerCase()) || hotel.description.toLowerCase().includes(search.toLowerCase());
+    const matchesRating = rating === '' || hotel.rating >= parseFloat(rating);
+    const matchesCity = city === '' || hotel.city.toLowerCase() === city.toLowerCase();
+    return matchesSearch && matchesRating && matchesCity;
+  });
+
+  res.render("home", { hotels: filteredHotels, search, rating, city });
 });
 
 
 
+//login page 1 call
 app.get('/login', (req, res) => {
   res.render('login'); // render login.ejs
 });
 
-// Register Form
+// Register Form call
 app.get('/register', (req, res) => {
   res.render('register'); // render register.ejs (create this separately)
 });
 
+//Save Register Data
 app.post("/saveReg", (req, res) => {
   const { name, email, password, confirm_password, contact} = req.body;
   const type="user";
@@ -110,31 +86,51 @@ app.post("/saveReg", (req, res) => {
     else{
        res.render("login.ejs",);
     }
-   
   });
 });
 
 
 // Handle login POST
 app.post('/login', (req, res) => {
-  const { email, password} = req.body;
-  const type="User";
+  const { email, password } = req.body;
+  const type = "User";
 
-  const sql = 'SELECT * FROM userMaster WHERE useremail = ? AND password = ? AND type =?';
+  const sql = 'SELECT * FROM userMaster WHERE useremail = ? AND password = ? AND type = ?';
   conn.query(sql, [email, password, type], (err, results) => {
     if (err) {
       console.error(err);
-      return res.send('An error occurred.');
+      return res.status(500).send('An error occurred.');
     }
 
     if (results.length > 0) {
       const user = results[0];
-      res.send(`Welcome ${user.username} (${user.type})!`);
+
+      const payload = {
+        id: user.id,
+        name: user.username,
+        email: user.useremail,
+        type: user.type
+      };
+
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN
+      });
+
+      return res.json({
+        message: `Welcome ${user.username} (${user.type})!`,token
+      });
     } else {
-      res.send('Invalid credentials or user type.');
+      return res.status(401).send('Invalid credentials or user type.');
     }
   });
 });
+
+
+
+
+
+
+
 
 
 

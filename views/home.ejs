@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,24 +35,62 @@
     </div>
   </nav>
 
+  <!-- Search and Filter Bar -->
+  <div class="container mt-4">
+    <form class="row g-3" method="GET" action="/">
+      <div class="col-md-4">
+        <input type="text" class="form-control" name="search" placeholder="Search hotels by name or description" value="<%= search || '' %>">
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="rating">
+          <option value="">Filter by Rating</option>
+          <option value="4.5" <%= rating === '4.5' ? 'selected' : '' %>>4.5+</option>
+          <option value="4.0" <%= rating === '4.0' ? 'selected' : '' %>>4.0+</option>
+          <option value="3.5" <%= rating === '3.5' ? 'selected' : '' %>>3.5+</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="city">
+          <option value="">Filter by City</option>
+          <option value="Mumbai" <%= city === 'Mumbai' ? 'selected' : '' %>>Mumbai</option>
+          <option value="Delhi" <%= city === 'Delhi' ? 'selected' : '' %>>Delhi</option>
+          <option value="Jaipur" <%= city === 'Jaipur' ? 'selected' : '' %>>Jaipur</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+      </div>
+    </form>
+  </div>
+
   <!-- Hotel Cards -->
   <div class="container mt-4">
     <div class="row">
-      <% hotels.forEach(function(hotel) { %>
-        <div class="col-md-4 mb-4">
-          <div class="card h-100">
-            <img src="<%= hotel.image %>" class="card-img-top" alt="Hotel Image">
-            <div class="card-body">
-              <h5 class="card-title"><%= hotel.name %></h5>
-              <p class="card-text"><%= hotel.description %></p>
-              <p><strong>Rating:</strong> <%= hotel.rating %> ★</p>
-              <a href="/cart/add/<%= hotel.id %>" class="btn btn-primary">Add to Cart</a>
-            </div>
-          </div>
+      <% if (hotels.length > 0) { %>
+  <% hotels.forEach(function(hotel) { %>
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <img src="<%= hotel.image %>" class="card-img-top" alt="Hotel Image">
+        <div class="card-body">
+          <h5 class="card-title"><%= hotel.name %></h5>
+          <p class="card-text"><%= hotel.description %></p>
+          <p><strong>Rating:</strong> <%= hotel.rating %> ★</p>
+          <p><strong>City:</strong> <%= hotel.city %></p>
+          <a href="/cart/add/<%= hotel.id %>" class="btn btn-primary">View Information</a>
         </div>
-      <% }); %>
+      </div>
+    </div>
+  <% }); %>
+<% } else { %>
+  <div class="col-12 text-center mt-5">
+    <h4>No hotels found matching your criteria.</h4>
+  </div>
+<% } %>
+
     </div>
   </div>
+
+  <!-- Map -->
   <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d60549.57264814955!2d73.80661599999999!3d18.467876399999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1749627132489!5m2!1sen!2sin" width="100%" height="300" style="border:1px solid black;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 
 </body>
