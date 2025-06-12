@@ -127,7 +127,7 @@ app.post('/login', (req, res) => {
 
     if (results.length > 0) {
       const user = results[0];
-      res.send(Welcome ${user.username} (${user.type})!);
+      res.send(Welcome ${user.username}, (${user.type}));
     } else {
       res.send('Invalid credentials or user type.');
     }
