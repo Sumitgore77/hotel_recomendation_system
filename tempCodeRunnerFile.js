@@ -1,1 +1,1 @@
-msg
+// Redirect to home page
