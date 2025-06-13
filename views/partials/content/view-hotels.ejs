@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>View Hotels</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container mt-5">
+
+    <% if (hotels.length > 0) { %>
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Address</th>
+          <th>City</th>
+          <th>Area</th>
+          <th>Email</th>
+          <th>Contact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% hotels.forEach((hotel, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td><img src="/uploads/<%= hotel.image %>" width="80" height="60" alt="Hotel Image"></td>
+          <td><%= hotel.hotel_name %></td>
+          <td><%= hotel.hotel_address %></td>
+          <td><%= hotel.city_name %></td>
+          <td><%= hotel.area_name %></td>
+          <td><%= hotel.hotel_email %></td>
+          <td><%= hotel.hotel_contact %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% } else { %>
+    <div class="alert alert-info">No hotels found.</div>
+    <% } %>
+    <br>
+
+    <!-- Go to Add Hotel Form -->
+    <a href="/dashboard?section=hotels" class="btn btn-primary">+ Add New Hotel</a>
+  </div>
+</body>
+
+</html>
