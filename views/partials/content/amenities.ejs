@@ -1,3 +1,45 @@
-<h2>Users Management</h2>
-<p>This is the amenities section.</p>
-<!-- Add your user list or admin actions here -->
+<div class="container mt-5">
+  <h2>Add New Amenity</h2>
+
+  <!-- Form to add amenity -->
+  <form action="/admin/add-amenity" method="POST" class="row g-3 mb-4">
+    <div class="col-md-10">
+      <input type="text" name="amenity_name" class="form-control" placeholder="Enter amenity name" required />
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-success w-100">Add Amenity</button>
+    </div>
+  </form>
+
+  <!-- Amenity List Table -->
+  <h4 class="mt-4">Amenity List</h4>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Sr. No.</th>
+        <th>Amenity Name</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (!amenities || amenities.length === 0) { %>
+        <tr>
+          <td colspan="3" class="text-center text-muted">No amenities present.</td>
+        </tr>
+      <% } else { %>
+        <% amenities.forEach((amenity, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= amenity.amenity_name %></td>
+            <td>
+              <form method="POST" action="/admin/delete-amenity/<%= amenity.amenity_id %>"
+                    onsubmit="return confirm('Delete this amenity?')">
+                <button class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
