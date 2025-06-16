@@ -5,48 +5,70 @@
   <meta charset="UTF-8">
   <title>View Hotels</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .hotel-card {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .hotel-card:hover {
+      transform: scale(1.02);
+    }
+
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+  </style>
 </head>
 
 <body>
   <div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Hotel Listings</h2>
+      <a href="/dashboard?section=hotels" class="btn btn-primary">+ Add New Hotel</a>
+    </div>
 
     <% if (hotels.length > 0) { %>
-    <table class="table table-bordered table-striped">
-      <thead class="table-dark">
-        <tr>
-          <th>#</th>
-          <th>Image</th>
-          <th>Name</th>
-          <th>Address</th>
-          <th>City</th>
-          <th>Area</th>
-          <th>Email</th>
-          <th>Contact</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% hotels.forEach((hotel, index) => { %>
-        <tr>
-          <td><%= index + 1 %></td>
-          <td><img src="/uploads/<%= hotel.image %>" width="80" height="60" alt="Hotel Image"></td>
-          <td><%= hotel.hotel_name %></td>
-          <td><%= hotel.hotel_address %></td>
-          <td><%= hotel.city_name %></td>
-          <td><%= hotel.area_name %></td>
-          <td><%= hotel.hotel_email %></td>
-          <td><%= hotel.hotel_contact %></td>
-        </tr>
-        <% }) %>
-      </tbody>
-    </table>
+    <div class="row">
+      <% hotels.forEach((hotel, index) => { %>
+      <div class="col-md-4 mb-4">
+        <div class="card hotel-card">
+          <% if (hotel.image) { %>
+            <img src="/uploads/<%= hotel.image %>" class="card-img-top" alt="Hotel Image">
+          <% } else { %>
+            <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="No Image">
+          <% } %>
+          <div class="card-body">
+            <h5 class="card-title"><%= hotel.hotel_name %></h5>
+            <p class="card-text mb-1"><strong>Address:</strong> <%= hotel.hotel_address %></p>
+            <p class="card-text mb-1"><strong>City:</strong> <%= hotel.city_name %> | <strong>Area:</strong> <%= hotel.area_name %></p>
+            <p class="card-text mb-1"><strong>Email:</strong> <%= hotel.hotel_email %></p>
+            <p class="card-text mb-3"><strong>Contact:</strong> <%= hotel.hotel_contact %></p>
+
+            <div class="d-flex justify-content-between">
+              <a href="/admin/edit-hotel/<%= hotel.hotel_id %>" class="btn btn-warning btn-sm">Update</a>
+              <form method="POST" action="/admin/delete-hotel/<%= hotel.hotel_id %>" onsubmit="return confirm('Are you sure you want to delete this hotel?');">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+    </div>
     <% } else { %>
     <div class="alert alert-info">No hotels found.</div>
     <% } %>
-    <br>
-
-    <!-- Go to Add Hotel Form -->
-    <a href="/dashboard?section=hotels" class="btn btn-primary">+ Add New Hotel</a>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

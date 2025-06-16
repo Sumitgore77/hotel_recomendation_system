@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Confirmation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f2f4f8;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .ticket {
+      background: white;
+      border-radius: 12px;
+      padding: 30px 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border-left: 8px solid #4CAF50;
+    }
+
+    h1 {
+      color: #4CAF50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      margin-bottom: 25px;
+    }
+
+    .section h2 {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 5px;
+    }
+
+    .detail {
+      margin-bottom: 8px;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="ticket">
+    <h1>✅ Booking Confirmed</h1>
+
+    <div class="section">
+      <h2>🏨 Hotel Information</h2>
+      <div class="detail"><span class="label">Name:</span> <%= booking.hotel_name %></div>
+      <div class="detail"><span class="label">Address:</span> <%= booking.hotel_address %></div>
+      <div class="detail"><span class="label">Email:</span> <%= booking.hotel_email %></div>
+      <% if (booking.contact) { %>
+        <div class="detail"><span class="label">Contact:</span> <%= booking.contact %></div>
+      <% } %>
+    </div>
+
+    <div class="section">
+      <h2>📅 Booking Details</h2>
+      <div class="detail"><span class="label">Booking Date:</span> <%= booking.booking_date %></div>
+      <div class="detail"><span class="label">Check-in:</span> <%= booking.checkin_date %> at <%= booking.checkin_time %></div>
+      <div class="detail"><span class="label">Check-out:</span> <%= booking.checkout_date %> at <%= booking.checkout_time %></div>
+    </div>
+
+    <a class="btn" href="/user/home">🏠 Back to Home</a>
+  </div>
+</body>
+</html>

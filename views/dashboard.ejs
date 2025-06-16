@@ -81,10 +81,17 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link <%= section === 'amenities' ? 'active' : '' %>" href="/admin/amenities">
+              <a class="nav-link <%= section === 'city' ? 'active' : '' %>" href="/admin/city">
+                <i class="fas fa-city"></i> City
+              </a>
+            </li>
+            <!-- Fix this link: -->
+            <li class="nav-item">
+              <a class="nav-link <%= section === 'amenities' ? 'active' : '' %>" href="/dashboard?section=amenities">
                 <i class="fas fa-concierge-bell"></i> Amenities
               </a>
             </li>
+
             <li class="nav-item">
               <a class="nav-link <%= section === 'ratings' ? 'active' : '' %>" href="/admin/ratings">
                 <i class="fas fa-star"></i> Ratings
@@ -104,15 +111,14 @@
           <% } else if (section === 'bookings') { %>
           <%- include('partials/content/bookings') %>
           <% } else if (section === 'view-hotels') { %>
-          <!-- FIXED -->
           <%- include('partials/content/view-hotels') %>
-          <% } else if (section === 'addhotel') { %>
-          <!-- FIXED -->
-          <%- include('partials/content/addhotel') %>
           <% } else if (section === 'amenities') { %>
           <%- include('partials/content/amenities') %>
           <% } else if (section === 'ratings') { %>
           <%- include('partials/content/ratings') %>
+          <% } else if (section === 'city') { %>
+          <%- include('partials/content/city') %>
+
           <% } else { %>
           <h2>Invalid Section</h2>
           <% } %>
