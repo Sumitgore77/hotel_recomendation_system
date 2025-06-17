@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 app.get('/user/book/:hotel_id', (req, res) => {
   const hotelId = req.params.hotel_id;
 
@@ -59,3 +60,6 @@ app.post('/user/book/:hotel_id', (req, res) => {
   });
 });
 
+=======
+afterLogin
+>>>>>>> Stashed changes

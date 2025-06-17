@@ -1,4 +1,5 @@
 const express = require('express');
+<<<<<<< Updated upstream
 const app = express();
 const path = require('path');
 require('dotenv').config();
@@ -15,8 +16,34 @@ app.use(express.urlencoded({
   extended: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
+=======
+const dotenv = require('dotenv');
+const path = require('path');
+const session = require('express-session');
+const flash = require('express-flash');
 
+dotenv.config();
+const app = express();
+
+const authRoutes = require('./src/routes/authRoutes');
+const hotelRoutes = require('./src/routes/hotelRoutes');
+const { render } = require('ejs');
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'yoursecretkey',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // set true if using HTTPS
+}));
+
+app.use(express.urlencoded({ extended: true }));
+>>>>>>> Stashed changes
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+<<<<<<< Updated upstream
 const session = require('express-session');
 
 app.use(session({
@@ -175,6 +202,18 @@ app.get('/debug-session', (req, res) => {
 // ================== ADMIN ROUTES ===================
 app.get('/admin/:section', (req, res) => {
   const section = req.params.section;
+=======
+app.use('/', hotelRoutes);
+app.use('/', authRoutes);
+
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(flash());
+>>>>>>> Stashed changes
 
   if (section === 'users') {
     conn.query('SELECT * FROM userMaster WHERE type != "admin"', (err, result) => {
