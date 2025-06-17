@@ -57,36 +57,46 @@
           <option value="Jaipur" <%= city === 'Jaipur' ? 'selected' : '' %>>Jaipur</option>
         </select>
       </div>
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">Filter</button>
-      </div>
     </form>
   </div>
+
+  <!-- Auto-submit on filter change -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.querySelector('form');
+      const selects = form.querySelectorAll('select');
+
+      selects.forEach(select => {
+        select.addEventListener('change', () => {
+          form.submit();
+        });
+      });
+    });
+  </script>
 
   <!-- Hotel Cards -->
   <div class="container mt-4">
     <div class="row">
       <% if (hotels.length > 0) { %>
-  <% hotels.forEach(function(hotel) { %>
-    <div class="col-md-4 mb-4">
-      <div class="card h-100">
-        <img src="<%= hotel.image %>" class="card-img-top" alt="Hotel Image">
-        <div class="card-body">
-          <h5 class="card-title"><%= hotel.name %></h5>
-          <p class="card-text"><%= hotel.description %></p>
-          <p><strong>Rating:</strong> <%= hotel.rating %> ★</p>
-          <p><strong>City:</strong> <%= hotel.city %></p>
-          <a href="/cart/add/<%= hotel.id %>" class="btn btn-primary">View Information</a>
+        <% hotels.forEach(function(hotel) { %>
+          <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <img src="<%= hotel.image %>" class="card-img-top" alt="Hotel Image">
+              <div class="card-body">
+                <h5 class="card-title"><%= hotel.name %></h5>
+                <p class="card-text"><%= hotel.description %></p>
+                <p><strong>Rating:</strong> <%= hotel.rating %> ★</p>
+                <p><strong>City:</strong> <%= hotel.city %></p>
+                <a href="/cart/add/<%= hotel.id %>" class="btn btn-primary">View Information</a>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="col-12 text-center mt-5">
+          <h4>No hotels found matching your criteria.</h4>
         </div>
-      </div>
-    </div>
-  <% }); %>
-<% } else { %>
-  <div class="col-12 text-center mt-5">
-    <h4>No hotels found matching your criteria.</h4>
-  </div>
-<% } %>
-
+      <% } %>
     </div>
   </div>
 

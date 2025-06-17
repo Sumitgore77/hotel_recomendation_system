@@ -66,35 +66,18 @@
         <div class="position-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link <%= section === 'users' ? 'active' : '' %>" href="/admin/users">
+              <a class="nav-link <%= section === 'users' ? 'active' : '' %>" href="/dashboard?section=users">
                 <i class="fas fa-users"></i> Users
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link <%= section === 'hotels' ? 'active' : '' %>" href="/admin/hotels">
+              <a class="nav-link <%= section === 'hotels' ? 'active' : '' %>" href="/dashboard?section=hotels">
                 <i class="fas fa-hotel"></i> Hotels
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link <%= section === 'bookings' ? 'active' : '' %>" href="/admin/bookings">
+              <a class="nav-link <%= section === 'bookings' ? 'active' : '' %>" href="/dashboard?section=bookings">
                 <i class="fas fa-book"></i> Bookings
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <%= section === 'city' ? 'active' : '' %>" href="/admin/city">
-                <i class="fas fa-city"></i> City
-              </a>
-            </li>
-            <!-- Fix this link: -->
-            <li class="nav-item">
-              <a class="nav-link <%= section === 'amenities' ? 'active' : '' %>" href="/dashboard?section=amenities">
-                <i class="fas fa-concierge-bell"></i> Amenities
-              </a>
-            </li>
-
-            <li class="nav-item">
-              <a class="nav-link <%= section === 'ratings' ? 'active' : '' %>" href="/admin/ratings">
-                <i class="fas fa-star"></i> Ratings
               </a>
             </li>
           </ul>
@@ -110,19 +93,18 @@
           <%- include('partials/content/hotels') %>
           <% } else if (section === 'bookings') { %>
           <%- include('partials/content/bookings') %>
+          
           <% } else if (section === 'view-hotels') { %>
-          <%- include('partials/content/view-hotels') %>
-          <% } else if (section === 'amenities') { %>
-          <%- include('partials/content/amenities') %>
-          <% } else if (section === 'ratings') { %>
-          <%- include('partials/content/ratings') %>
-          <% } else if (section === 'city') { %>
-          <%- include('partials/content/city') %>
+          <%- include('partials/content/view-hotels', { hotels }) %>
+          <% } else if (section === 'add-hotel') { %>
+          <%- include('partials/content/hotels') %>
+          <% } else if (section === 'edit-hotel') { %>
+          <%- include('partials/content/edit-hotel' , { hotel }) %>
+          
 
           <% } else { %>
           <h2>Invalid Section</h2>
           <% } %>
-
         </div>
       </main>
     </div>

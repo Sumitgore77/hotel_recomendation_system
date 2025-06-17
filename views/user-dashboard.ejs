@@ -5,35 +5,118 @@
   <title>User Dashboard - Hotels</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #f8f9fa;
-    }
+  body {
+    background-color: #f4f6f8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
 
-    .navbar {
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+  .navbar {
+    background-color: #1e2a38 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
 
-    .hotel-card {
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-      cursor: pointer;
-    }
+  .navbar-brand {
+    color: #f8c291 !important;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
 
-    .hotel-card:hover {
-      transform: scale(1.02);
-    }
+  .navbar-brand:hover {
+    color: #ffd8a8 !important;
+  }
 
-    .card-img-top {
-      height: 200px;
-      object-fit: cover;
-    }
+  .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+  }
 
-    .card-body {
-      padding: 1rem;
-    }
-  </style>
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  h3 {
+    color: #1e2a38;
+    font-weight: bold;
+  }
+
+  .hotel-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+  }
+
+  .hotel-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-img-top {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e2a38;
+  }
+
+  .card-text {
+    font-size: 0.95rem;
+    color: #555;
+  }
+
+  .modal-header {
+    background-color: #1e2a38;
+    color: white;
+  }
+
+  .modal-title {
+    font-weight: 600;
+  }
+
+  .modal-footer .btn-success {
+    background-color: #1e8449;
+    border-color: #1e8449;
+  }
+
+  .modal-footer .btn-success:hover {
+    background-color: #145a32;
+    border-color: #145a32;
+  }
+
+  .modal-footer .btn-info {
+    background-color: #117a8b;
+    border-color: #117a8b;
+    color: white;
+  }
+
+  .modal-footer .btn-info:hover {
+    background-color: #0d5d68;
+    border-color: #0d5d68;
+  }
+
+  .modal-footer .btn-secondary:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+  }
+
+  .alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+</style>
+
 </head>
 <body>
 
@@ -97,7 +180,6 @@
                   </div>
                   <div class="modal-footer">
                     <a href="/user/book/<%= hotel.hotel_id %>" class="btn btn-success">Book Hotel</a>
-                    <a href="/user/rate/<%= hotel.hotel_id %>" class="btn btn-info">Add Rating</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                   </div>
                 </div>
