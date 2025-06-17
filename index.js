@@ -481,8 +481,29 @@ app.post('/admin/update-hotel/:id', upload.single('hotel_image'), (req, res) => 
       res.status(500).send('Internal server error');
     });
 });
+app.get('/user/home', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/user/login');
+  }
 
+  const sql = `
+    SELECT h.*, c.city_name, a.area_name
+    FROM hotelMaster h
+    JOIN citymaster c ON h.city_id = c.city_id
+    JOIN areamaster a ON h.area_id = a.area_id
+  `;
 
+  conn.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching hotels:", err);
+      return res.status(500).send("Server error while loading hotels.");
+    }
+
+    res.render('user-dashboard', {
+      hotels: results
+    });
+  });
+});
 
 
 
@@ -514,6 +535,7 @@ app.post('/admin/add-city', (req, res) => {
 });
 
 //============================ User Login Dashboard===========================
+
 // GET: Show booking form for a hotel
 app.get('/user/book/:hotel_id', (req, res) => {
   const hotelId = req.params.hotel_id;
@@ -589,6 +611,7 @@ app.post('/user/book/:hotel_id', (req, res) => {
     }
   );
 });
+
 
 
 // ================== LOGOUT ===================
