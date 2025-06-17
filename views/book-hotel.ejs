@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Book Hotel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f4f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .booking-card {
+      max-width: 650px;
+      margin: 60px auto;
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .booking-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+      background: linear-gradient(90deg, #1e2a38, #2d3b50);
+      color: #f8c291;
+      text-align: center;
+      padding: 25px;
+    }
+
+    .card-header h3 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 24px;
+    }
+
+    label {
+      font-weight: 500;
+      color: #333;
+    }
+
+    input[type="date"],
+    input[type="time"] {
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input[type="date"]:hover,
+    input[type="time"]:hover {
+      border-color: #1e2a38;
+      box-shadow: 0 0 8px rgba(30, 42, 56, 0.2);
+    }
+
+    input[type="date"]:focus,
+    input[type="time"]:focus {
+      border-color: #f8c291;
+      box-shadow: 0 0 10px rgba(248, 194, 145, 0.5);
+      outline: none;
+    }
+
+    .btn-primary-custom {
+      background-color: #1e2a38;
+      color: #f8c291;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn-primary-custom:hover {
+      background-color: #2d3b50;
+      transform: scale(1.03);
+    }
+
+    .btn-secondary-custom {
+      background-color: transparent;
+      color: #1e2a38;
+      border: 2px solid #1e2a38;
+      border-radius: 8px;
+      transition: background-color 0.3s, color 0.3s, transform 0.3s;
+    }
+
+    .btn-secondary-custom:hover {
+      background-color: #1e2a38;
+      color: #ffffff;
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card booking-card">
+    <div class="card-header">
+      <h3>Book <%= hotel.hotel_name %></h3>
+    </div>
+    <div class="card-body p-4">
+      <form method="POST">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="checkin_date" class="form-label">Check-in Date</label>
+            <input type="date" name="checkin_date" id="checkin_date" required class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="checkin_time" class="form-label">Check-in Time</label>
+            <input type="time" name="checkin_time" id="checkin_time" required class="form-control">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="checkout_date" class="form-label">Check-out Date</label>
+            <input type="date" name="checkout_date" id="checkout_date" required class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="checkout_time" class="form-label">Check-out Time</label>
+            <input type="time" name="checkout_time" id="checkout_time" required class="form-control">
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-4">
+          <button class="btn btn-primary-custom py-2">✅ Book Now</button>
+          <a href="/user-dashboard" class="btn btn-secondary-custom py-2">❌ Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

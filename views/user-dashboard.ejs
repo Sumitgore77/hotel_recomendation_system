@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Dashboard - Hotels</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+  body {
+    background-color: #f4f6f8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .navbar {
+    background-color: #1e2a38 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .navbar-brand {
+    color: #f8c291 !important;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+
+  .navbar-brand:hover {
+    color: #ffd8a8 !important;
+  }
+
+  .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  h3 {
+    color: #1e2a38;
+    font-weight: bold;
+  }
+
+  .hotel-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+  }
+
+  .hotel-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-img-top {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e2a38;
+  }
+
+  .card-text {
+    font-size: 0.95rem;
+    color: #555;
+  }
+
+  .modal-header {
+    background-color: #1e2a38;
+    color: white;
+  }
+
+  .modal-title {
+    font-weight: 600;
+  }
+
+  .modal-footer .btn-success {
+    background-color: #1e8449;
+    border-color: #1e8449;
+  }
+
+  .modal-footer .btn-success:hover {
+    background-color: #145a32;
+    border-color: #145a32;
+  }
+
+  .modal-footer .btn-info {
+    background-color: #117a8b;
+    border-color: #117a8b;
+    color: white;
+  }
+
+  .modal-footer .btn-info:hover {
+    background-color: #0d5d68;
+    border-color: #0d5d68;
+  }
+
+  .modal-footer .btn-secondary:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+  }
+
+  .alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+</style>
+
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-primary" href="/user/home">Welcome to Hotel Recommender</a>
+      <div class="d-flex">
+        <a href="/logout" class="btn btn-outline-danger">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div class="container">
+    <h3 class="mb-4">Available Hotels</h3>
+
+    <% if (hotels.length > 0) { %>
+      <div class="row">
+        <% hotels.forEach((hotel, index) => { %>
+          <div class="col-md-4 mb-4">
+            <!-- Hotel Card -->
+            <div class="card hotel-card" data-bs-toggle="modal" data-bs-target="#hotelModal<%= hotel.hotel_id %>">
+              <% if (hotel.image) { %>
+                <img src="/uploads/<%= hotel.image %>" class="card-img-top" alt="Hotel Image">
+              <% } else { %>
+                <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="No Image">
+              <% } %>
+              <div class="card-body">
+                <h5 class="card-title text-primary"><%= hotel.hotel_name %></h5>
+                <p class="card-text mb-1"><strong>City:</strong> <%= hotel.city_name %></p>
+                <p class="card-text mb-1"><strong>Area:</strong> <%= hotel.area_name %></p>
+              </div>
+            </div>
+
+            <!-- Hotel Modal -->
+            <div class="modal fade" id="hotelModal<%= hotel.hotel_id %>" tabindex="-1" aria-labelledby="hotelModalLabel<%= hotel.hotel_id %>" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="hotelModalLabel<%= hotel.hotel_id %>"><%= hotel.hotel_name %></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <% if (hotel.image) { %>
+                          <img src="/uploads/<%= hotel.image %>" class="img-fluid rounded" alt="Hotel Image">
+                        <% } else { %>
+                          <img src="https://via.placeholder.com/400x250?text=No+Image" class="img-fluid rounded" alt="No Image">
+                        <% } %>
+                      </div>
+                      <div class="col-md-6">
+                        <p><strong>Address:</strong> <%= hotel.hotel_address %></p>
+                        <p><strong>City:</strong> <%= hotel.city_name %></p>
+                        <p><strong>Area:</strong> <%= hotel.area_name %></p>
+                        <p><strong>Email:</strong> <%= hotel.hotel_email %></p>
+                        <p><strong>Contact:</strong> <%= hotel.contact %></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="/user/book/<%= hotel.hotel_id %>" class="btn btn-success">Book Hotel</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Modal -->
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="alert alert-warning">No hotels available at the moment.</div>
+    <% } %>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
