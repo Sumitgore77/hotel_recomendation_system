@@ -1,1 +1,3 @@
-/admin/add-hotel
+ // if (!userId) {
+  //   return res.redirect('/user/login');
+  // }

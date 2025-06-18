@@ -3,6 +3,7 @@ const app = express();
 const path = require('path');
 require('dotenv').config();
 const bodyParser = require("body-parser");
+
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -98,10 +99,7 @@ app.post("/saveReg", (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const {
-    email,
-    password
-  } = req.body;
+  const { email, password } = req.body;
 
   const sql = 'SELECT * FROM userMaster WHERE useremail = ?';
   conn.query(sql, [email], async (err, results) => {
@@ -109,57 +107,31 @@ app.post('/login', (req, res) => {
     if (results.length === 0) return res.status(401).send('Invalid email or password.');
 
     const user = results[0];
-    const isMatch = user.type === 'admin' ? password === user.password : await bcrypt.compare(password, user.password);
+    const isMatch = user.type === 'admin'
+      ? password === user.password
+      : await bcrypt.compare(password, user.password);
+
     if (!isMatch) return res.status(401).send('Invalid email or password.');
 
-    const payload = {
-      id: user.id,
-      name: user.username,
-      email: user.useremail,
-      type: user.type
-    };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN
-    });
+    // ✅ Save user details in session
+    req.session.userId = user.userid;
+    req.session.userType = user.type;
+    req.session.username = user.username;
+    req.session.email = user.useremail;
+    req.session.contact = user.contact;
 
+    // Debug log
+    console.log("Session after login:", req.session);
+
+    // Redirect based on role
     if (user.type === 'admin') {
-      conn.query('SELECT * FROM userMaster WHERE type != "admin"', (err, result) => {
-        if (err) return res.status(500).send('Database error');
-        res.render('dashboard', {
-          section: 'users',
-          users: result
-        });
-      });
+      return res.redirect('/admin/dashboard');
     } else {
-      req.session.userId = user.userid;
-      const sql = `
-    SELECT 
-  h.hotel_id,
-  h.hotel_name,
-  h.hotel_address,
-  h.hotel_email AS hotel_email,   
-  h.hotel_contact AS contact,
-  h.image,
-  c.city_name,
-  a.area_name
-FROM 
-  hotelMaster h
-JOIN 
-  cityMaster c ON h.city_id = c.city_id
-JOIN 
-  areaMaster a ON h.area_id = a.area_id
-  `;
-
-      conn.query(sql, (err, hotels) => {
-        if (err) return res.status(500).send('Database error');
-        req.session.userId = results[0].userid;
-        res.render("user-dashboard", {
-          hotels
-        });
-      });
+      return res.redirect('/user/home');
     }
   });
 });
+
 
 app.get('/debug-session', (req, res) => {
   res.json(req.session);
@@ -331,36 +303,81 @@ app.get('/dashboard', (req, res) => {
       cities: [],
       areas: [],
       hotel: null,
+      users: [],
       ...overrideData
     });
   };
 
-
   if (section === 'view-hotels') {
-    const sql = `
-      SELECT h.*, c.city_name, a.area_name
-      FROM hotelmaster h
-      LEFT JOIN citymaster c ON h.city_id = c.city_id
-      LEFT JOIN areamaster a ON h.area_id = a.area_id
-    `;
+  const sql = `
+    SELECT 
+      h.hotel_id,
+      h.hotel_name,
+      h.hotel_address,
+      h.hotel_email,
+      h.hotel_contact AS contact,
+      h.image,
+      c.city_name,
+      a.area_name,
+      IFNULL(rc.count, 0) AS review_count,
+      GROUP_CONCAT(am.amenity_name SEPARATOR ', ') AS amenities
+    FROM hotelmaster h
+    LEFT JOIN citymaster c ON h.city_id = c.city_id
+    LEFT JOIN areamaster a ON h.area_id = a.area_id
+    LEFT JOIN hotelreviewcount rc ON h.hotel_id = rc.hotel_id
+    LEFT JOIN hotelamenitiesjoin haj ON h.hotel_id = haj.hotel_id
+    LEFT JOIN amenities am ON haj.amenity_id = am.amenity_id
+    GROUP BY h.hotel_id
+  `;
 
-    conn.query(sql, (err, results) => {
+  conn.query(sql, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Database error');
+    }
+
+    const hotels = results.map(hotel => ({
+      ...hotel,
+      amenities: hotel.amenities ? hotel.amenities.split(',').map(a => a.trim()) : []
+    }));
+
+    res.render('dashboard', {
+      section: 'view-hotels',
+      hotels
+    });
+  });
+
+
+
+  } else if (section === 'users') {
+    const sql = `SELECT * FROM usermaster WHERE type = 'user'`;
+    conn.query(sql, (err, users) => {
       if (err) {
         console.error(err);
-        return res.status(500).send('Database error');
+        return defaultRender();
+      }
+      defaultRender({ users });
+    });
+
+  } else if (section === 'bookings') {
+    const sql = `
+      SELECT b.*, u.username, h.hotel_name, h.image
+      FROM bookingmaster b
+      JOIN usermaster u ON b.userid = u.userid
+      JOIN hotelmaster h ON b.hotel_id = h.hotel_id
+      ORDER BY b.booking_date DESC
+    `;
+
+    conn.query(sql, (err, bookings) => {
+      if (err) {
+        console.error('Error fetching bookings:', err);
+        return res.status(500).send('Server error while fetching bookings');
       }
 
-      res.render('dashboard', {
-        section: 'view-hotels',
-        hotels: results || [] 
-      });
+      res.render('dashboard', { section, bookings });
     });
-  }else if (section === 'add-hotel') {
-    res.render('dashboard', {
-      section: 'add-hotel',
-      hotels: []
-    });
-  }else if (section === 'edit-hotel' && hotelId) {
+
+  } else if (section === 'edit-hotel' && hotelId) {
     const sql = `
       SELECT h.*, c.city_name, a.area_name
       FROM hotelmaster h
@@ -377,15 +394,29 @@ app.get('/dashboard', (req, res) => {
 
       defaultRender({ hotel: result[0] });  
     });
-  }
-  else {
+
+  } else {
     res.render('dashboard', {
       section,
       hotels: [] 
     });
   }
 });
+//======================== delete bookings ============
+app.post('/delete-booking/:id', (req, res) => {
+  const bookingId = req.params.id;
 
+  conn.query('DELETE FROM bookingmaster WHERE booking_id = ?', [bookingId], (err, result) => {
+    if (err) {
+      console.error('Error deleting booking:', err);
+      return res.status(500).send('Server error');
+    }
+
+    res.redirect('/dashboard?section=bookings');
+  });
+});
+
+//===============================================================
 
 app.get('/admin/add-hotel', (req, res) => {
   res.render('partials/content/add-hotel'); 
@@ -481,30 +512,47 @@ app.post('/admin/update-hotel/:id', upload.single('hotel_image'), (req, res) => 
       res.status(500).send('Internal server error');
     });
 });
+
+
+
 app.get('/user/home', (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/user/login');
   }
 
-  const sql = `
-    SELECT h.*, c.city_name, a.area_name
-    FROM hotelMaster h
-    JOIN citymaster c ON h.city_id = c.city_id
-    JOIN areamaster a ON h.area_id = a.area_id
+  const hotelQuery = `
+    SELECT 
+      h.hotel_id,
+      h.hotel_name,
+      h.hotel_address,
+      c.city_name,
+      ar.area_name,
+      h.hotel_email,
+      h.hotel_contact,
+      h.image,
+      GROUP_CONCAT(a.amenity_name SEPARATOR ', ') AS Amenities
+    FROM hotelmaster h
+    LEFT JOIN citymaster c ON h.city_id = c.city_id
+    LEFT JOIN areamaster ar ON h.area_id = ar.area_id
+    LEFT JOIN hotelamenitiesjoin haj ON h.hotel_id = haj.hotel_id
+    LEFT JOIN amenities a ON haj.amenity_id = a.amenity_id
+    GROUP BY h.hotel_id;
   `;
 
-  conn.query(sql, (err, results) => {
+  conn.query(hotelQuery, (err, result) => {
     if (err) {
       console.error("Error fetching hotels:", err);
-      return res.status(500).send("Server error while loading hotels.");
+      return res.status(500).send("Server error");
     }
 
     res.render('user-dashboard', {
-      hotels: results
+      hotels: result,
+      username: req.session.username,
+      email: req.session.email,
+      contact: req.session.contact
     });
   });
 });
-
 
 
 // ================== DELETE USER ===================
@@ -533,8 +581,70 @@ app.post('/admin/add-city', (req, res) => {
     res.redirect('/admin/city');
   });
 });
+//==================== Bookings ================
+app.get('/admin/bookings', (req, res) => {
+  const sql = `
+    SELECT b.*, u.username, h.hotel_name, h.image
+    FROM bookingmaster b
+    JOIN usermaster u ON b.userid = u.userid
+    JOIN hoteldetail h ON b.hotel_id = h.hotel_id
+    ORDER BY b.booking_date DESC
+  `;
+  conn.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching bookings:", err);
+      return res.status(500).send("Error loading bookings.");
+    }
+    res.render('admin-bookings', { bookings: results });
+  });
+});
 
 //============================ User Login Dashboard===========================
+
+app.get('/user/home', (req, res) => {
+  // 🔒 Check for login session
+  if (!req.session.userId) {
+    return res.redirect('/user/login');
+  }
+
+  // 🐞 Debug: Log session data to console
+  console.log("Session Data:", {
+    username: req.session.username,
+    email: req.session.email,
+    contact: req.session.contact
+  });
+
+console.log("Full session data:", req.session);
+
+  // 🏨 SQL to get hotels with amenities
+  const hotelQuery = `
+    SELECT h.*, 
+           GROUP_CONCAT(a.amenity_name SEPARATOR ', ') AS Amenities
+    FROM hotelmaster h
+    LEFT JOIN hotelamenitiesjoin haj ON h.hotel_id = haj.hotel_id
+    LEFT JOIN amenities a ON haj.amenity_id = a.amenity_id
+    GROUP BY h.hotel_id
+  `;
+
+  // 📦 Fetch hotels and render dashboard
+  conn.query(hotelQuery, (err, result) => {
+    if (err) {
+      console.error("Error fetching hotels with amenities:", err);
+      return res.status(500).send("Server Error");
+    }
+
+    res.render('user-dashboard', {
+      hotels: result,
+      username: req.session.username,
+      email: req.session.email,
+      contact: req.session.contact
+    });
+  });
+});
+
+
+
+
 
 // GET: Show booking form for a hotel
 app.get('/user/book/:hotel_id', (req, res) => {
@@ -611,8 +721,24 @@ app.post('/user/book/:hotel_id', (req, res) => {
     }
   );
 });
+//======================= review and rating ========================
+app.get('/user/review/:hotel_id', (req, res) => {
+  const hotel_id = req.params.hotel_id;
+  res.render('review-page', { hotel_id });
+});
 
+// POST submit review
+app.post('/submit-review', (req, res) => {
+  const { hotel_id, rating, rev_text } = req.body;
+  const rev_date = new Date();
 
+  const sql = "INSERT INTO reviewmaster (rev_text, rating, rev_date) VALUES (?, ?, ?)";
+  conn.query(sql, [rev_text, rating, rev_date], (err, result) => {
+    if (err) throw err;
+    console.log('Review submitted');
+    res.redirect('/user/home');
+  });
+});
 
 // ================== LOGOUT ===================
 app.get('/logout', (req, res) => {

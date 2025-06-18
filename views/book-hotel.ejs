@@ -1,120 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Book Hotel</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     body {
-      background-color: #f4f4f9;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: url('/images/1.jpg') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+
+    .booking-wrapper {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 15px;
     }
 
     .booking-card {
-      max-width: 650px;
-      margin: 60px auto;
-      background-color: #ffffff;
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 35px 30px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      width: 100%;
+      max-width: 700px;
+      transition: transform 0.3s ease;
     }
 
     .booking-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      transform: scale(1.01);
     }
 
-    .card-header {
-      background: linear-gradient(90deg, #1e2a38, #2d3b50);
-      color: #f8c291;
+    h3 {
+      font-weight: 700;
       text-align: center;
-      padding: 25px;
+      margin-bottom: 25px;
+      color: #fff;
     }
 
-    .card-header h3 {
-      margin: 0;
-      font-weight: 600;
-      font-size: 24px;
-    }
-
-    label {
+    .form-label {
       font-weight: 500;
-      color: #333;
+      color: #fff;
     }
 
-    input[type="date"],
-    input[type="time"] {
+    .form-control {
       border-radius: 10px;
-      border: 1px solid #ccc;
-      transition: border-color 0.3s, box-shadow 0.3s;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.4);
     }
 
-    input[type="date"]:hover,
-    input[type="time"]:hover {
-      border-color: #1e2a38;
-      box-shadow: 0 0 8px rgba(30, 42, 56, 0.2);
+    .form-control::placeholder {
+      color: #ddd;
     }
 
-    input[type="date"]:focus,
-    input[type="time"]:focus {
-      border-color: #f8c291;
-      box-shadow: 0 0 10px rgba(248, 194, 145, 0.5);
+    .form-control:focus {
+      border-color: #fff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
       outline: none;
     }
 
     .btn-primary-custom {
-      background-color: #1e2a38;
-      color: #f8c291;
+      background-color: #4CAF50;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      color: white;
       transition: background-color 0.3s, transform 0.3s;
     }
 
     .btn-primary-custom:hover {
-      background-color: #2d3b50;
-      transform: scale(1.03);
+      background-color: #3e8e41;
+      transform: scale(1.02);
     }
 
     .btn-secondary-custom {
       background-color: transparent;
-      color: #1e2a38;
-      border: 2px solid #1e2a38;
-      border-radius: 8px;
-      transition: background-color 0.3s, color 0.3s, transform 0.3s;
+      color: white;
+      border: 2px solid white;
+      border-radius: 10px;
+      transition: all 0.3s;
     }
 
     .btn-secondary-custom:hover {
-      background-color: #1e2a38;
-      color: #ffffff;
-      transform: scale(1.03);
+      background-color: white;
+      color: black;
+      transform: scale(1.02);
+    }
+
+    @media (max-width: 768px) {
+      .row.g-3 {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="card booking-card">
-    <div class="card-header">
+  <div class="overlay"></div>
+
+  <div class="booking-wrapper">
+    <div class="booking-card">
       <h3>Book <%= hotel.hotel_name %></h3>
-    </div>
-    <div class="card-body p-4">
       <form method="POST">
-        <div class="row">
-          <div class="col-md-6 mb-3">
+        <div class="row g-3">
+          <div class="col-md-6">
             <label for="checkin_date" class="form-label">Check-in Date</label>
             <input type="date" name="checkin_date" id="checkin_date" required class="form-control">
           </div>
-          <div class="col-md-6 mb-3">
+          <div class="col-md-6">
             <label for="checkin_time" class="form-label">Check-in Time</label>
             <input type="time" name="checkin_time" id="checkin_time" required class="form-control">
           </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 mb-3">
+          <div class="col-md-6">
             <label for="checkout_date" class="form-label">Check-out Date</label>
             <input type="date" name="checkout_date" id="checkout_date" required class="form-control">
           </div>
-          <div class="col-md-6 mb-3">
+          <div class="col-md-6">
             <label for="checkout_time" class="form-label">Check-out Time</label>
             <input type="time" name="checkout_time" id="checkout_time" required class="form-control">
           </div>
@@ -122,12 +150,13 @@
 
         <div class="d-grid gap-2 mt-4">
           <button class="btn btn-primary-custom py-2">✅ Book Now</button>
-          <button type="button" class="btn btn-primary-custom" onclick="window.location.href='/user/home'">Close</button>
-
+          <button type="button" class="btn btn-secondary-custom py-2" onclick="window.location.href='/user/home'">❌ Cancel</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
