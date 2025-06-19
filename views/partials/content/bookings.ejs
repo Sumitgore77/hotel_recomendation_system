@@ -5,46 +5,7 @@
   <title>All Bookings - Admin Panel</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-  <style>
-    body {
-      background-color: #f2f4f8;
-    }
-    .booking-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-bottom: 24px;
-      padding: 16px;
-      display: flex;
-      gap: 20px;
-    }
-    .hotel-img {
-      width: 160px;
-      height: 120px;
-      border-radius: 12px;
-      object-fit: cover;
-    }
-    .info {
-      flex-grow: 1;
-    }
-    .info h5 {
-      margin-bottom: 4px;
-    }
-    .info p {
-      margin: 0;
-      font-size: 14px;
-    }
-    .booking-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .badge {
-      font-size: 12px;
-    }
-  </style>
-  
+  <link rel="stylesheet" href="/CSS/bookings.css">
 </head>
 <body>
 <!-- Search bar -->
@@ -99,33 +60,6 @@
 <% }) %>
 
 <!-- JavaScript for search filter by hotel or username -->
-<script>
-  document.getElementById('searchInput').addEventListener('input', function () {
-    const query = this.value.toLowerCase();
-    document.querySelectorAll('.hotel-group').forEach(group => {
-      const hotel = group.getAttribute('data-hotel');
-      let groupVisible = hotel.includes(query);
-
-      // Check each row for matching username
-      const rows = group.querySelectorAll('tbody tr');
-      let anyRowVisible = false;
-
-      rows.forEach(row => {
-        const username = row.getAttribute('data-username');
-        const match = username.includes(query) || hotel.includes(query);
-        row.style.display = match ? '' : 'none';
-        if (match) anyRowVisible = true;
-      });
-
-      // Hide entire group if no row is visible
-      group.style.display = anyRowVisible ? 'block' : 'none';
-    });
-  });
-</script>
-
-
-
-
-
+<script src="../js/bookings.js"></script>
 </body>
 </html>
