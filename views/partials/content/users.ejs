@@ -1,4 +1,12 @@
-<div class="container mt-4">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container mt-4">
     <h2 class="mb-4">Registered Users</h2>
 
     <% if (typeof users !== 'undefined' && users.length > 0) { %>
@@ -25,7 +33,7 @@
                     <td class="text-center">
                         <form method="POST" action="/admin/delete-user/<%= user.userid %>"
                             onsubmit="return confirm('Are you sure you want to delete this user?');">
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
                         </form>
                     </td>
                 </tr>
@@ -37,3 +45,6 @@
     <div class="alert alert-info">No users found.</div>
     <% } %>
 </div>
+    
+</body>
+</html>
