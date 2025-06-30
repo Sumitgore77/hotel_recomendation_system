@@ -18,13 +18,20 @@ app.use(session({
     secret: "secret123",
     resave: false,
     saveUninitialized: true,
-  })
+  })  
 );
+
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
 
 const homeRoutes = require("./src/routes/homeRoutes");
 const authRoutes = require("./src/routes/authRoutes");
 app.use("/", homeRoutes);
 app.use("/", authRoutes);
+app.use('/user', authRoutes);
+
 
 //-----------------------------------------
 
@@ -40,7 +47,6 @@ app.use('/', dashboardRoutes);
 
 const bookingRoutes = require('./src/routes/bookingRoutes');
 app.use('/', bookingRoutes);
-app.use(bookingRoutes);
 
 //------------------------------------------
 
@@ -50,9 +56,12 @@ app.use('/', hotelRoutes);
 //---------------------------------------------
 
 const userRoutes = require('./src/routes/userRoutes');
-app.use(userRoutes);
 app.use('/user', userRoutes);
 
+//====================================
+
+const recommendRoutes = require("./src/routes/recommendRoutes");
+app.use("/", recommendRoutes);
 
 
 //===================review ================

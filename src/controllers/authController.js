@@ -2,7 +2,11 @@ const bcrypt = require("bcryptjs");
 const conn = require("../config/db");
 
 exports.renderLogin = (req, res) => res.render("login");
-exports.renderRegister = (req, res) => res.render("register");
+
+
+exports.renderRegister = (req, res) => {
+  res.render("register")
+};
 
 exports.registerUser = (req, res) => {
   const { name, email, password, confirm_password, contact } = req.body;
@@ -54,10 +58,33 @@ exports.loginUser = (req, res) => {
     req.session.email = user.useremail;
     req.session.contact = user.contact;
 
+    console.log(req.session);
+
     if (user.type === "admin") {
       return res.redirect("/admin/dashboard");
     } else {
       return res.redirect("/user/home");
     }
   });
+};
+
+
+exports.logout = (req, res) => {
+  const userType = req.session?.userType; // Save type before destroying session
+
+   if (userType === "admin"  || userType === "user") {
+
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Logout error:", err);
+    }
+
+    res.clearCookie('connect.secret123');
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+
+   
+      res.redirect("/login"); // You can customize this route if needed
+    } 
+  );
+}
 };

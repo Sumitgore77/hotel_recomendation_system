@@ -1,5 +1,8 @@
 const path = require("path");
-const conn = require("../config/db");
+const conn = require('../config/db');
+
+
+
 
 exports.handleAdminSection = (req, res) => {
   const section = req.params.section;
@@ -32,6 +35,9 @@ exports.handleAdminSection = (req, res) => {
 
 // ===================== HOTEL FORM HANDLING =====================
 
+// ================= BACKEND: addHotel Controller =================
+const validator = require("validator");
+
 exports.addHotel = (req, res) => {
   const {
     name,
@@ -40,46 +46,57 @@ exports.addHotel = (req, res) => {
     area_name,
     email,
     contact,
-    amenities
+    amenities,
+    room_type,
+    price
   } = req.body;
+
   const image = req.file ? req.file.filename : null;
   const rating = null;
   const reviewcount = null;
 
+  // === Basic Input Validation ===
+  if (!name || name.trim().length < 3) return res.status(400).send("Invalid hotel name.");
+  if (!address || address.trim() === "") return res.status(400).send("Invalid address.");
+  if (!city_name || city_name.trim() === "") return res.status(400).send("Invalid city.");
+  if (!area_name || area_name.trim() === "") return res.status(400).send("Invalid area.");
+  if (!email || !validator.isEmail(email)) return res.status(400).send("Invalid email format.");
+  if (!contact || !/^[6-9]\d{9}$/.test(contact)) return res.status(400).send("Invalid contact number.");
+  if (!room_type || !price) return res.status(400).send("Room type and price required.");
+
+  const roomTypeList = room_type.split(",").map(r => r.trim()).filter(r => r !== "");
+  const priceList = price.split(",").map(p => parseFloat(p.trim())).filter(p => !isNaN(p));
+
+  if (roomTypeList.length !== priceList.length) {
+    return res.status(400).send("Room types and prices count mismatch.");
+  }
+
+  const amenityList = (amenities || "").split(",").map(a => a.trim()).filter(a => a !== "");
+
+  // === City and Area Insertion ===
   const getCityId = new Promise((resolve, reject) => {
-    const cityQuery = "SELECT city_id FROM citymaster WHERE city_name = ?";
-    conn.query(cityQuery, [city_name], (err, rows) => {
+    conn.query("SELECT city_id FROM citymaster WHERE city_name = ?", [city_name], (err, rows) => {
       if (err) return reject(err);
       if (rows.length > 0) return resolve(rows[0].city_id);
-
-      conn.query(
-        "INSERT INTO citymaster (city_name) VALUES (?)",
-        [city_name],
-        (err2, result) => {
-          if (err2) return reject(err2);
-          resolve(result.insertId);
-        }
-      );
+      conn.query("INSERT INTO citymaster (city_name) VALUES (?)", [city_name], (err2, result) => {
+        if (err2) return reject(err2);
+        resolve(result.insertId);
+      });
     });
   });
 
   const getAreaId = new Promise((resolve, reject) => {
-    const areaQuery = "SELECT area_id FROM areamaster WHERE area_name = ?";
-    conn.query(areaQuery, [area_name], (err, rows) => {
+    conn.query("SELECT area_id FROM areamaster WHERE area_name = ?", [area_name], (err, rows) => {
       if (err) return reject(err);
       if (rows.length > 0) return resolve(rows[0].area_id);
-
-      conn.query(
-        "INSERT INTO areamaster (area_name) VALUES (?)",
-        [area_name],
-        (err2, result) => {
-          if (err2) return reject(err2);
-          resolve(result.insertId);
-        }
-      );
+      conn.query("INSERT INTO areamaster (area_name) VALUES (?)", [area_name], (err2, result) => {
+        if (err2) return reject(err2);
+        resolve(result.insertId);
+      });
     });
   });
 
+  // === Hotel Insertion and Chained Logic ===
   Promise.all([getCityId, getAreaId])
     .then(([city_id, area_id]) => {
       const insertHotel = `
@@ -87,61 +104,61 @@ exports.addHotel = (req, res) => {
         (hotel_name, hotel_address, city_id, area_id, hotel_email, hotel_contact, rating, reviewcount, image)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      conn.query(
-        insertHotel,
-        [name, address, city_id, area_id, email, contact, rating, reviewcount, image],
-        (err, result) => {
-          if (err) return res.status(500).send("Error inserting hotel");
-          const hotel_id = result.insertId;
 
-          // Handle amenities
-          if (!amenities || amenities.trim() === "")
-            return res.redirect("/dashboard?section=view-hotels");
+      conn.query(insertHotel, [name, address, city_id, area_id, email, contact, rating, reviewcount, image], (err, result) => {
+        if (err) return res.status(500).send("Error inserting hotel.");
 
-          const amenityList = amenities
-            .split(",")
-            .map((a) => a.trim())
-            .filter((a) => a !== "");
+        const hotel_id = result.insertId;
 
-          const getAmenityIds = amenityList.map((amenityName) => {
-            return new Promise((resolve, reject) => {
-              const checkQuery =
-                "SELECT amenity_id FROM amenities WHERE amenity_name = ?";
-              conn.query(checkQuery, [amenityName], (err, rows) => {
-                if (err) return reject(err);
-                if (rows.length > 0) return resolve(rows[0].amenity_id);
-
-                conn.query(
-                  "INSERT INTO amenities (amenity_name) VALUES (?)",
-                  [amenityName],
-                  (err2, result) => {
-                    if (err2) return reject(err2);
-                    resolve(result.insertId);
-                  }
-                );
+        const roomInsertPromises = roomTypeList.map((roomType, index) => {
+          return new Promise((resolve, reject) => {
+            conn.query("SELECT room_id FROM roomsmaster WHERE room_type = ?", [roomType], (err, rows) => {
+              if (err) return reject(err);
+              if (rows.length > 0) return resolve({ room_id: rows[0].room_id, price: priceList[index] });
+              conn.query("INSERT INTO roomsmaster (room_type) VALUES (?)", [roomType], (err2, result) => {
+                if (err2) return reject(err2);
+                resolve({ room_id: result.insertId, price: priceList[index] });
               });
             });
           });
+        });
 
-          Promise.all(getAmenityIds)
-            .then((amenityIds) => {
-              const values = amenityIds.map((aid) => [hotel_id, aid]);
-              conn.query(
-                "INSERT INTO hotelamenitiesjoin (hotel_id, amenity_id) VALUES ?",
-                [values],
-                (err3) => {
+        Promise.all(roomInsertPromises).then((roomDataList) => {
+          const hotelRoomValues = roomDataList.map(({ room_id, price }) => [hotel_id, room_id, price]);
+          conn.query("INSERT INTO hotelroomjoin (hotel_id, room_id, price) VALUES ?", [hotelRoomValues], (err2) => {
+            if (err2) return res.status(500).send("Error linking rooms");
+
+            const getAmenityIds = amenityList.map((amenityName) => {
+              return new Promise((resolve, reject) => {
+                conn.query("SELECT amenity_id FROM amenities WHERE amenity_name = ?", [amenityName], (err, rows) => {
+                  if (err) return reject(err);
+                  if (rows.length > 0) return resolve(rows[0].amenity_id);
+                  conn.query("INSERT INTO amenities (amenity_name) VALUES (?)", [amenityName], (err2, result) => {
+                    if (err2) return reject(err2);
+                    resolve(result.insertId);
+                  });
+                });
+              });
+            });
+
+            Promise.all(getAmenityIds)
+              .then((amenityIds) => {
+                if (amenityIds.length === 0) return res.redirect("/dashboard?section=view-hotels");
+
+                const amenityValues = amenityIds.map((aid) => [hotel_id, aid]);
+                conn.query("INSERT INTO hotelamenitiesjoin (hotel_id, amenity_id) VALUES ?", [amenityValues], (err3) => {
                   if (err3) return res.status(500).send("Error linking amenities");
                   res.redirect("/dashboard?section=view-hotels");
-                }
-              );
-            })
-            .catch(() => res.status(500).send("Failed processing amenities"));
-        }
-      );
+                });
+              })
+              .catch(() => res.status(500).send("Error processing amenities"));
+          });
+        }).catch(() => res.status(500).send("Error linking room types"));
+      });
     })
     .catch(() => res.status(500).send("Error resolving city or area"));
 };
-//================================
+
 // GET: Render Edit Hotel Form
 exports.editHotel = (req, res) => {
   const hotelId = req.params.id;
