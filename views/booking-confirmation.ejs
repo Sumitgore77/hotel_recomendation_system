@@ -11,178 +11,191 @@
 
  <link rel="stylesheet" href="../CSS/booking-confirmation.css">
  <style>
-  
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-      background: url('/images/1.jpg') no-repeat center center fixed;
-      background-size: cover;
-      height: 100vh;
-      overflow: hidden;
-    }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: url('/images/1.jpg') no-repeat center center fixed;
+    background-size: cover;
+    overflow: hidden; /* Prevent page scroll */
+  }
 
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 0;
-    }
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+  }
 
-    .confirmation-wrapper {
-      position: relative;
-      z-index: 1;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 40px 15px;
-    }
+  .confirmation-wrapper {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    overflow: hidden;
+  }
 
+  .ticket {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 24px 28px;          /* ⬅️ Slightly reduced padding */
+  max-width: 680px;            /* ⬅️ Reduced from 750px */
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  border-left: 8px solid #1e2a38;
+  color: #fff;
+  transition: transform 0.3s ease;
+  overflow: hidden;
+  transform: scale(0.95);      /* ⬅️ Make the card a bit smaller */
+}
+
+
+  .ticket:hover {
+    transform: scale(1.01);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 22px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .close-btn:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  h1 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 25px;
+    font-size: 28px;
+  }
+
+  .section {
+    margin-bottom: 25px;
+  }
+
+  .section h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 6px;
+    color: #f8c291;
+  }
+
+  .detail {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .label {
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .btn-custom {
+    display: inline-block;
+    background-color: #1e2a38;
+    color: #f8c291;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-decoration: none;
+    margin-top: 20px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .btn-custom:hover {
+    background-color: #2d3b50;
+    color: #fff;
+    transform: scale(1.03);
+  }
+
+  /* Modal Animation */
+  .modal.fade .modal-dialog {
+    transform: translateY(-50px);
+    opacity: 0;
+    transition: all 0.4s ease-in-out;
+  }
+
+  .modal.fade.show .modal-dialog {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .modal-content {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Star Rating */
+  .star-rating {
+    direction: rtl;
+    font-size: 2rem;
+    display: inline-flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .star-rating input[type="radio"] {
+    display: none;
+  }
+
+  .star-rating label {
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+
+  .star-rating input:checked ~ label,
+  .star-rating label:hover,
+  .star-rating label:hover ~ label {
+    color: #f8c291;
+  }
+
+  /* Responsive Scale for Low Screens */
+  @media (max-height: 700px) {
     .ticket {
-      position: relative;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 20px;
-      padding: 35px 40px;
-      max-width: 750px;
-      width: 100%;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      border-left: 8px solid #1e2a38;
-      color: #fff;
-      max-height: 90vh;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
+      transform: scale(0.9);
     }
+  }
 
-    .ticket:hover {
-      transform: scale(1.01);
+  @media (max-height: 600px) {
+    .ticket {
+      transform: scale(0.8);
     }
+  }
 
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 22px;
-      color: #fff;
-      background: rgba(0,0,0,0.2);
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.3s;
+  @media (max-width: 576px) {
+    .ticket {
+      padding: 20px;
+      transform: scale(0.85);
     }
-
-    .close-btn:hover {
-      background: rgba(0,0,0,0.4);
-    }
-
-    h1 {
-      text-align: center;
-      color: #fff;
-      margin-bottom: 25px;
-      font-size: 28px;
-    }
-
-    .section {
-      margin-bottom: 25px;
-    }
-
-    .section h2 {
-      font-size: 18px;
-      margin-bottom: 10px;
-      border-bottom: 1px dashed #ccc;
-      padding-bottom: 6px;
-      color: #f8c291;
-    }
-
-    .detail {
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-
-    .label {
-      font-weight: 600;
-      color: #ffffff;
-    }
-
-    .btn-custom {
-      display: inline-block;
-      background-color: #1e2a38;
-      color: #f8c291;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-weight: bold;
-      text-decoration: none;
-      margin-top: 20px;
-      text-align: center;
-      transition: all 0.3s;
-    }
-
-    .btn-custom:hover {
-      background-color: #2d3b50;
-      color: #fff;
-      transform: scale(1.03);
-    }
-
-    /* Modal Animation */
-    .modal.fade .modal-dialog {
-      transform: translateY(-50px);
-      opacity: 0;
-      transition: all 0.4s ease-in-out;
-    }
-
-    .modal.fade.show .modal-dialog {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    .modal-content {
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      backdrop-filter: blur(10px);
-    }
-
-    @media (max-width: 576px) {
-      .ticket {
-        padding: 25px 20px;
-      }
-    }
-    /* Star Rating */
-.star-rating {
-  direction: rtl;
-  font-size: 2rem;
-  display: inline-flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.star-rating input[type="radio"] {
-  display: none;
-}
-
-.star-rating label {
-  color: #ccc;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.star-rating input:checked ~ label,
-.star-rating label:hover,
-.star-rating label:hover ~ label {
-  color: #f8c291;
-}
-
-
+  }
  </style>
 </head>
 <body>
@@ -200,9 +213,7 @@
         <div class="detail"><span class="label">Name:</span> <%= booking.hotel_name %></div>
         <div class="detail"><span class="label">Address:</span> <%= booking.hotel_address %></div>
         <div class="detail"><span class="label">Email:</span> <%= booking.hotel_email %></div>
-        <% if (booking.contact) { %>
-          <div class="detail"><span class="label">Contact:</span> <%= booking.contact %></div>
-        <% } %>
+        <div class="detail"><span class="label">Room Type and Price:</span> <%= booking.room_type %>-<%= booking.price %></div>
       </div>
 
       <div class="section">
@@ -210,6 +221,8 @@
         <div class="detail"><span class="label">Booking Date:</span> <%= booking.booking_date %></div>
         <div class="detail"><span class="label">Check-in:</span> <%= booking.checkin_date %> at <%= booking.checkin_time %></div>
         <div class="detail"><span class="label">Check-out:</span> <%= booking.checkout_date %> at <%= booking.checkout_time %></div>
+        <p><strong>Room Type:</strong> <%= booking.room_type %></p>
+
       </div>
 
       <a class="btn-custom" href="/user/home">🏠 Back to Home</a>
@@ -218,7 +231,6 @@
   </div>
 
   <!-- Review Modal -->
-  <!-- Review Modal -->
 <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-dark p-3" style="border-radius: 16px; backdrop-filter: blur(8px); background: rgba(255,255,255,0.9);">
@@ -226,7 +238,7 @@
         <input type="hidden" name="hotel_id" value="<%= booking.hotel_id %>">
         
         <div class="modal-header border-0">
-          <h5 class="modal-title" id="reviewModalLabel">⭐ Submit Your Review</h5>
+          <h5 class="btn-custom" id="reviewModalLabel">⭐ Submit Your Review</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
 

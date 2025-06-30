@@ -1,5 +1,6 @@
 const conn = require('../config/db');
 
+// Delete user - restricted to non-admins
 exports.deleteUser = (req, res) => {
   const userId = req.params.id;
   const sql = 'DELETE FROM userMaster WHERE userid = ? AND type != "admin"';
@@ -10,18 +11,16 @@ exports.deleteUser = (req, res) => {
   });
 };
 
-
+// Render user dashboard
 exports.renderUserDashboard = (req, res) => {
-  if (!req.session.userId) {
+  if (!req.session || !req.session.userId) {
     return res.redirect("/user/login");
   }
 
-  console.log("Session Data:", {
-    username: req.session.username,
-    email: req.session.email,
-    contact: req.session.contact,
-  });
+  // Set Cache-Control to prevent browser caching
+   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 
+  // Query hotels and amenities
   const hotelQuery = `
     SELECT 
       h.hotel_id,
@@ -32,7 +31,7 @@ exports.renderUserDashboard = (req, res) => {
       c.city_name,
       a.area_name,
       h.image,
-      GROUP_CONCAT(am.amenity_name SEPARATOR ', ') AS Amenities
+      GROUP_CONCAT(DISTINCT am.amenity_name SEPARATOR ', ') AS Amenities
     FROM hotelmaster h
     LEFT JOIN citymaster c ON h.city_id = c.city_id
     LEFT JOIN areamaster a ON h.area_id = a.area_id
@@ -41,24 +40,64 @@ exports.renderUserDashboard = (req, res) => {
     GROUP BY h.hotel_id;
   `;
 
-  conn.query(hotelQuery, (err, result) => {
+  conn.query(hotelQuery, (err, hotels) => {
     if (err) {
-      console.error("❌ SQL Error:", err.sqlMessage || err.message || err);
-      return res.status(500).send("Server Error");
+      console.error("❌ Hotel SQL Error:", err.sqlMessage || err.message || err);
+      return res.status(500).send("Server Error while loading hotels.");
     }
 
-    res.render("user-dashboard", {
-      hotels: result,
-      username: req.session.username,
-      email: req.session.email,
-      contact: req.session.contact,
+    const roomQuery = `
+      SELECT 
+        hrj.hotel_id,
+        r.room_type,
+        hrj.price
+      FROM hotelroomjoin hrj
+      JOIN roomsmaster r ON hrj.room_id = r.room_id;
+    `;
+
+    conn.query(roomQuery, (err2, roomData) => {
+      if (err2) {
+        console.error("❌ Room SQL Error:", err2.sqlMessage || err2.message || err2);
+        return res.status(500).send("Server Error while loading rooms.");
+      }
+
+      // Map rooms to hotels
+      const hotelMap = {};
+      hotels.forEach(hotel => {
+        hotel.rooms = [];
+        hotel.amenities = hotel.Amenities ? hotel.Amenities.split(',').map(a => a.trim()) : [];
+        hotelMap[hotel.hotel_id] = hotel;
+      });
+
+      roomData.forEach(room => {
+        if (hotelMap[room.hotel_id]) {
+          hotelMap[room.hotel_id].rooms.push({
+            room_type: room.room_type,
+            price: room.price
+          });
+        }
+      });
+
+      // Render dashboard
+      res.render("user-dashboard", {
+        hotels,
+        username: req.session.username,
+        email: req.session.email,
+        contact: req.session.contact,
+      });
     });
   });
 };
 
-// Logout handler
+
 exports.logout = (req, res) => {
-  if (req.session) req.session.destroy();
-  res.clearCookie("token");
-  res.redirect("/");
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Logout error:", err);
+    }
+    res.clearCookie('connect.sid'); // Default cookie name for express-session
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.redirect('/login');
+  });
 };
+
