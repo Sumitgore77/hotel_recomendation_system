@@ -1,29 +1,26 @@
 const path = require("path");
 const conn = require('../config/db');
 
-
-
-
 exports.handleAdminSection = (req, res) => {
   const section = req.params.section;
 
   if (section === "users") {
-    conn.query('SELECT * FROM userMaster WHERE type != "admin"', (err, users) => {
+    conn.query('SELECT * FROM usermaster WHERE type != "admin"', (err, users) => {
       if (err) return res.status(500).send("Database error");
       res.render("dashboard", { section, users });
     });
 
   } else if (section === "hotels") {
-    conn.query("SELECT * FROM cityMaster", (err, cities) => {
+    conn.query("SELECT * FROM citymaster", (err, cities) => {
       if (err) return res.status(500).send("Database error");
-      conn.query("SELECT * FROM areaMaster", (err, areas) => {
+      conn.query("SELECT * FROM areamaster", (err, areas) => {
         if (err) return res.status(500).send("Database error");
         res.render("dashboard", { section, cities, areas });
       });
     });
 
   } else if (section === "city") {
-    conn.query("SELECT * FROM cityMaster", (err, cities) => {
+    conn.query("SELECT * FROM citymaster", (err, cities) => {
       if (err) return res.status(500).send("Database error");
       res.render("dashboard", { section, cities });
     });
@@ -40,16 +37,7 @@ const validator = require("validator");
 
 exports.addHotel = (req, res) => {
   const {
-    name,
-    address,
-    city_name,
-    area_name,
-    email,
-    contact,
-    amenities,
-    room_type,
-    price
-  } = req.body;
+    name,address,city_name,area_name,email,contact,amenities,room_type,price} = req.body;
 
   const image = req.file ? req.file.filename : null;
   const rating = null;
@@ -100,7 +88,7 @@ exports.addHotel = (req, res) => {
   Promise.all([getCityId, getAreaId])
     .then(([city_id, area_id]) => {
       const insertHotel = `
-        INSERT INTO hotelMaster
+        INSERT INTO hotelmaster
         (hotel_name, hotel_address, city_id, area_id, hotel_email, hotel_contact, rating, reviewcount, image)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
@@ -173,6 +161,21 @@ exports.editHotel = (req, res) => {
   });
 };
 
+//delete user login
+exports.deleteUser = (req, res) => {
+  const userId = req.params.id;
+  const sql = 'DELETE FROM usermaster WHERE userid = ? AND type != "admin"';
+
+  conn.query(sql, [userId], (err) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).send("Database error.");
+    }
+    res.redirect("/admin/users"); // Change to your actual user list page
+  });
+};
+
+
 // POST: Update Hotel
 exports.updateHotel = (req, res) => {
   const hotelId = req.params.id;
@@ -228,9 +231,8 @@ exports.updateHotel = (req, res) => {
     .then(([city_id, area_id]) => {
       let updateQuery = `
         UPDATE hotelmaster
-        SET hotel_name = ?, hotel_address = ?, hotel_email = ?, hotel_contact = ?,
-            city_id = ?, area_id = ?
-      `;
+        SET hotel_name = ?, hotel_address = ?, hotel_email = ?, hotel_contact = ?,city_id = ?, area_id = ?`;
+        
       const queryParams = [
         hotel_name,
         hotel_address,
@@ -266,9 +268,9 @@ exports.updateHotel = (req, res) => {
 exports.renderViewHotels = (req, res) => {
   const sql = `
     SELECT h.*, c.city_name, a.area_name
-    FROM hotelMaster h
-    JOIN cityMaster c ON h.city_id = c.city_id
-    JOIN areaMaster a ON h.area_id = a.area_id
+    FROM hotelmaster h
+    JOIN citymaster c ON h.city_id = c.city_id
+    JOIN areamaster a ON h.area_id = a.area_id
   `;
 
   conn.query(sql, (err, hotels) => {

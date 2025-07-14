@@ -1,7 +1,8 @@
+/* Responsive Styling for User Dashboard */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding-top: 70px;
-        background: linear-gradient(135deg, #1f1c2c, #928dab);
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
   background-size: cover;
   min-height: 100vh;
   color: #fff;
@@ -20,16 +21,6 @@ body {
 
 .navbar-brand:hover {
   color: #ffd8a8 !important;
-}
-
-.btn-outline-danger {
-  border-color: #dc3545;
-  color: #dc3545;
-}
-
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  color: white;
 }
 
 .profile-avatar {
@@ -69,7 +60,7 @@ body {
 h3 {
   color: #ffffff;
   font-weight: bold;
-  margin-top: 1rem; /* reduce gap under navbar */
+  margin-top: 1rem;
 }
 
 .hotel-card {
@@ -81,11 +72,15 @@ h3 {
   cursor: pointer;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: scale(0.95);
+  transform-origin: center;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
 .hotel-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  transform: scale(1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
 .card-img-top {
@@ -97,6 +92,8 @@ h3 {
 
 .card-body {
   padding: 1rem;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
 .card-title {
@@ -116,7 +113,6 @@ h3 {
   border: none;
   color: #fff;
   overflow: hidden;
-  max-height: 90vh; /* reduced from 95vh */
   display: flex;
   flex-direction: column;
 }
@@ -133,22 +129,13 @@ h3 {
   flex-grow: 1;
   overflow-y: auto;
   max-height: 90vh;
+  display: flex;
+  flex-direction: column;
 }
-/* Disable modal body scroll */
+
 .modal-dialog {
-  max-width: 900px; /* or any width you prefer */
+  max-width: 900px;
 }
-
-.modal-content {
-  max-height: none;
-  overflow: visible;
-}
-
-.modal-body {
-  max-height: none !important;
-  overflow: visible !important;
-}
-
 
 .modal-body .row {
   display: flex;
@@ -208,24 +195,79 @@ h3 {
   z-index: 1;
 }
 
-
-/* Zoom out the card slightly */
-.hotel-card {
-  transform: scale(0.95);
-  transform-origin: center;
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-  max-height: none !important;
-  overflow: visible !important;
+/* Gap between recommendation button and filters */
+.recommendation-button {
+  margin-bottom: 1rem;
 }
 
-/* On hover, still lift a little */
-.hotel-card:hover {
-  transform: scale(1);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hotel-card {
+    margin-bottom: 1rem;
+  }
+
+  .card-img-top {
+    height: 180px;
+  }
+
+  .modal-dialog {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .modal-body .row {
+    flex-direction: column;
+  }
+
+  .modal-body .col-md-6:first-child,
+  .modal-body .col-md-6:last-child {
+    padding: 0;
+    border: none;
+  }
+
+  .modal-body {
+    padding: 0.5rem;
+  }
+
+  .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+
+  .recommendation-button {
+    margin-bottom: 1rem;
+  }
 }
 
-/* Remove restriction from card body */
-.hotel-card .card-body {
-  max-height: none !important;
-  overflow: visible !important;
+@media (max-width: 576px) {
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-text {
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .profile-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .navbar-brand {
+    font-size: 1rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+  }
+
+  .recommendation-button {
+    margin-bottom: 1rem;
+  }
 }
