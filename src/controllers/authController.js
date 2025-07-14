@@ -15,7 +15,7 @@ exports.registerUser = (req, res) => {
   if (password !== confirm_password)
     return res.send("Password and Confirm Password do not match.");
 
-  const checkSql = "SELECT * FROM userMaster WHERE useremail = ?";
+  const checkSql = "SELECT * FROM usermaster WHERE useremail = ?";
   conn.query(checkSql, [email], (err, results) => {
     if (err) return res.send("Error checking email.");
     if (results.length > 0)
@@ -23,7 +23,7 @@ exports.registerUser = (req, res) => {
 
     const hashedPassword = bcrypt.hashSync(password, 8);
     const insertSql =
-      "INSERT INTO userMaster (username, useremail, password, contact, type) VALUES (?, ?, ?, ?, ?)";
+      "INSERT INTO usermaster (username, useremail, password, contact, type) VALUES (?, ?, ?, ?, ?)";
     conn.query(
       insertSql,
       [name, email, hashedPassword, contact, type],
@@ -36,36 +36,47 @@ exports.registerUser = (req, res) => {
 };
 
 exports.loginUser = (req, res) => {
-  const { email, password } = req.body;
-
-  const sql = "SELECT * FROM userMaster WHERE useremail = ?";
-  conn.query(sql, [email], async (err, results) => {
-    if (err) return res.status(500).send("Server error.");
-    if (results.length === 0)
-      return res.status(401).send("Invalid email or password.");
-
-    const user = results[0];
-    const isMatch =
-      user.type === "admin"
-        ? password === user.password
-        : await bcrypt.compare(password, user.password);
-
-    if (!isMatch) return res.status(401).send("Invalid email or password.");
-
-    req.session.userId = user.userid;
-    req.session.userType = user.type;
-    req.session.username = user.username;
-    req.session.email = user.useremail;
-    req.session.contact = user.contact;
-
-    console.log(req.session);
-
-    if (user.type === "admin") {
-      return res.redirect("/admin/dashboard");
-    } else {
-      return res.redirect("/user/home");
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).send("Email and password required.");
     }
-  });
+
+    const sql = "SELECT * FROM usermaster WHERE useremail = ?";
+    conn.query(sql, [email], async (err, results) => {
+      if (err) {
+        console.error("SQL Error:", err);
+        return res.status(500).send("Server error.");
+      }
+
+      if (results.length === 0) {
+        return res.status(401).send("Invalid email or password.");
+      }
+
+      const user = results[0];
+      const isMatch =
+        user.type === "admin"
+          ? password === user.password
+          : await bcrypt.compare(password, user.password);
+
+      if (!isMatch) return res.status(401).send("Invalid email or password.");
+
+      req.session.userId = user.userid;
+      req.session.userType = user.type;
+      req.session.username = user.username;
+      req.session.email = user.useremail;
+      req.session.contact = user.contact;
+
+      console.log("Login success:", req.session);
+
+      return user.type === "admin"
+        ? res.redirect("/admin/dashboard")
+        : res.redirect("/user/home");
+    });
+  } catch (err) {
+    console.error("Login Handler Crash:", err);
+    return res.status(500).send("Internal Server Error.");
+  }
 };
 
 

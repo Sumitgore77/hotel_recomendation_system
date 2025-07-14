@@ -46,15 +46,11 @@
 
               <!-- here we wnat to implement enable disable feature -->
               <td class="text-center">
-                <form method="POST" action="/admin/delete-user/<%= user.userid %>" onsubmit="return confirm('Are you sure you want to Disable this user?');">
-                  <button type="submit" class="btn btn-sm btn-danger">Disable</button>
+                <form method="POST" action="/admin/delete-user/<%= user.userid %>" onsubmit="return confirm('Are you sure you want to Delete this user?');">
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                 </form>
               </td>
-              <td class="text-center">
-                <form method="POST" action="/admin/delete-user/<%= user.userid %>" onsubmit="return confirm('Are you sure you want to Enable this user?');">
-                  <button type="submit" class="btn btn-sm btn-success">Enable</button>
-                </form>
-              </td>
+            
             </tr>
           <% }) %>
         </tbody>

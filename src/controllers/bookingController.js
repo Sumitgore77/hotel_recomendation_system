@@ -134,7 +134,7 @@ exports.bookHotel = (req, res) => {
         SELECT b.*, h.hotel_name, h.hotel_address, h.hotel_email,
                r.room_type, j.price
         FROM bookingmaster b
-        JOIN hotelMaster h ON b.hotel_id = h.hotel_id
+        JOIN hotelmaster h ON b.hotel_id = h.hotel_id
         JOIN roomsmaster r ON b.room_id = r.room_id
         JOIN hotelroomjoin j ON b.hotel_id = j.hotel_id AND b.room_id = j.room_id
         WHERE b.booking_id = ?

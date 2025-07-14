@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname)),
 });
 const upload = multer({ storage });
-
+router.post("/admin/delete-user/:id", adminController.deleteUser);
 router.get("/admin/:section", adminController.handleAdminSection);
 // Route to add hotel
 router.post("/admin/add-hotel", upload.single("image"), adminController.addHotel);

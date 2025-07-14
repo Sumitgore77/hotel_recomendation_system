@@ -1,15 +1,7 @@
 const conn = require('../config/db');
 
 // Delete user - restricted to non-admins
-exports.deleteUser = (req, res) => {
-  const userId = req.params.id;
-  const sql = 'DELETE FROM userMaster WHERE userid = ? AND type != "admin"';
 
-  conn.query(sql, [userId], (err) => {
-    if (err) return res.status(500).send("Database error.");
-    res.redirect("/admin/users");
-  });
-};
 
 // Render user dashboard
 exports.renderUserDashboard = (req, res) => {

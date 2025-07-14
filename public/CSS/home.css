@@ -1,6 +1,4 @@
-
-    /* Background Slideshow */
-    body {
+body {
       margin: 0;
       padding: 0;
       background: #000;
@@ -42,25 +40,11 @@
     }
 
     @keyframes slideShow {
-      0% {
-        opacity: 0;
-      }
-
-      8% {
-        opacity: 1;
-      }
-
-      25% {
-        opacity: 1;
-      }
-
-      33% {
-        opacity: 0;
-      }
-
-      100% {
-        opacity: 0;
-      }
+      0% { opacity: 0; }
+      8% { opacity: 1; }
+      25% { opacity: 1; }
+      33% { opacity: 0; }
+      100% { opacity: 0; }
     }
 
     .overlay {
@@ -101,4 +85,61 @@
     h5 {
       color: #fff;
     }
-  
+
+    @media (max-width: 768px) {
+      .navbar .navbar-brand {
+        font-size: 1rem;
+      }
+
+      form.row.g-3 .col-md-4,
+      form.row.g-3 .col-md-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+
+      .card {
+        margin-bottom: 1rem;
+      }
+
+      .card-title {
+        font-size: 1.1rem;
+      }
+
+      .card-text {
+        font-size: 0.95rem;
+      }
+
+      iframe {
+        height: 200px;
+      }
+
+      footer p {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar .navbar-brand {
+        font-size: 0.9rem;
+      }
+
+      .navbar .btn {
+        font-size: 0.8rem;
+        padding: 3px 6px;
+      }
+
+      h3,
+      h4,
+      h5 {
+        font-size: 1.1rem;
+        text-align: center;
+      }
+
+      .card-title {
+        font-size: 1rem;
+      }
+
+      .card-text {
+        font-size: 0.9rem;
+      }
+    }
